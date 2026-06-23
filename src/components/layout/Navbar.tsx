@@ -20,7 +20,6 @@ export default function Navbar() {
 
         <Button
           color="inherit"
-          component={Link}
           href="/"
         >
           Accueil
@@ -28,7 +27,6 @@ export default function Navbar() {
 
         <Button
           color="inherit"
-          component={Link}
           href="/creer-evenement"
         >
           Créer un événement
@@ -36,7 +34,6 @@ export default function Navbar() {
 
         <Button
           color="inherit"
-          component={Link}
           href="/superadmin/login"
         >
           Super Admin
