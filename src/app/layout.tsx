@@ -32,7 +32,6 @@ export default function RootLayout({
       lang="fr"
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
-      <head />
       <body>
         <MuiProvider>
           <Navbar />

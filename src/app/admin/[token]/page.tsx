@@ -15,18 +15,12 @@ import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-
 type Participant = {
   id: string;
   firstName: string;
-  lastName: string | null;
+  lastName: string;
   phone: string;
-  email?: string | null;
-
-  qrToken?: string | null;
+  email?: string;
   status:
     | 'PENDING'
     | 'APPROVED'
@@ -111,61 +105,6 @@ export default function AdminPage() {
 
       loadEvent();
     };
-
-  const [qrDialogOpen, setQrDialogOpen] =
-    useState(false);
-
-  const [qrDataUrl, setQrDataUrl] =
-    useState('');
-
-  const [selectedParticipant,
-    setSelectedParticipant] =
-    useState<Participant | null>(null);
-
-  const showQrCode = async (participant: Participant) => {
-    const response = await fetch(`/api/participants/${participant.id}/qr`);
-    const data = await response.json();
-
-    setQrDataUrl(data.qrDataUrl);
-
-    setSelectedParticipant(participant);
-
-    setQrDialogOpen(true);
-  };
-
-  const downloadQr = () => {
-    if (!qrDataUrl || !selectedParticipant) return;
-    const link = document.createElement('a');
-    link.href = qrDataUrl;
-    const safeName = (selectedParticipant.firstName || 'participant').replace(/[^a-z0-9_-]/gi, '_');
-    link.download = `qr_${safeName}_${selectedParticipant.id}.png`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  };
-
-  const shareWhatsApp = () => {
-    if (!selectedParticipant || !event) return;
-    const base = window.location.origin;
-    const inscriptionUrl = `${base}/inscription/${event.id}`;
-    const text = `QR pour ${selectedParticipant.firstName} ${selectedParticipant.lastName ?? ''} - ${event.title} \n${inscriptionUrl}`;
-    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
-  };
-
-  const resendEmail = async () => {
-    if (!selectedParticipant) return;
-    try {
-      const res = await fetch(`/api/admin/participants/${selectedParticipant.id}/resend`, { method: 'POST' });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || 'Erreur lors de l\'envoi');
-      }
-      window.alert('Email renvoyé');
-    } catch (e) {
-      window.alert(e instanceof Error ? e.message : 'Erreur');
-    }
-  };
 
   if (loading) {
     return (
@@ -279,111 +218,44 @@ export default function AdminPage() {
                           : 'warning'
                     }
                   />
-                  {
-                    (() => {
-                      switch (participant.status) {
-                        case 'PENDING':
-                          return (
-                            <Stack direction="row" spacing={1}>
-                              <Button
-                                color="success"
-                                variant="contained"
-                                onClick={() =>
-                                  approveParticipant(participant.id)
-                                }
-                              >
-                                Approuver
-                              </Button>
 
-                              <Button
-                                color="error"
-                                variant="outlined"
-                                onClick={() =>
-                                  rejectParticipant(participant.id)
-                                }
-                              >
-                                Refuser
-                              </Button>
-                            </Stack>
-                          );
+                  {participant.status ===
+                    'PENDING' && (
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                    >
+                      <Button
+                        color="success"
+                        variant="contained"
+                        onClick={() =>
+                          approveParticipant(
+                            participant.id
+                          )
+                        }
+                      >
+                        Approuver
+                      </Button>
 
-                        case 'APPROVED':
-                        case 'CHECKED_IN':
-                          return (
-                            <Button variant="outlined" onClick={() => showQrCode(participant)}>
-                              Voir QR
-                            </Button>
-                          );
-
-                        default:
-                          return null;
-                      }
-                    })()
-                  }
+                      <Button
+                        color="error"
+                        variant="outlined"
+                        onClick={() =>
+                          rejectParticipant(
+                            participant.id
+                          )
+                        }
+                      >
+                        Refuser
+                      </Button>
+                    </Stack>
+                  )}
                 </Box>
               </CardContent>
             </Card>
           )
         )}
       </Stack>
-
-      <Dialog
-        open={qrDialogOpen}
-        onClose={() =>
-            setQrDialogOpen(false)
-        }
-        maxWidth="sm"
-        fullWidth
-        >
-        <DialogTitle>
-            QR Code Participant
-        </DialogTitle>
-
-        <DialogContent>
-            <Box
-            sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                py: 3,
-            }}
-            >
-            {qrDataUrl && (
-                <img
-                src={qrDataUrl}
-                alt="QR Code"
-                width={300}
-                height={300}
-                />
-            )}
-            </Box>
-
-            {selectedParticipant && (
-            <Typography
-                align="center"
-            >
-                {
-                selectedParticipant.firstName
-                }{' '}
-                {
-                selectedParticipant.lastName
-                }
-            </Typography>
-            )}
-            {selectedParticipant && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 2 }}>
-                <Button variant="contained" size="small" onClick={downloadQr}>
-                  Télécharger QR
-                </Button>
-                <Button variant="outlined" size="small" onClick={shareWhatsApp}>
-                  Partager WhatsApp
-                </Button>
-                <Button variant="outlined" size="small" onClick={resendEmail}>
-                  Envoyer Email
-                </Button>
-              </Box>
-            )}
-        </DialogContent>
-      </Dialog>
     </Container>
   );
 }

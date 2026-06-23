@@ -252,7 +252,6 @@ export default function InscriptionPage() {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-      timeZone: 'Europe/Paris',
     });
 
   const formattedTime =
@@ -261,8 +260,6 @@ export default function InscriptionPage() {
     ).toLocaleTimeString('fr-FR', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false,
-      timeZone: 'Europe/Paris',
     });
 
   return (

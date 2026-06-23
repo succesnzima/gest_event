@@ -20,6 +20,7 @@ export default function Navbar() {
 
         <Button
           color="inherit"
+          component={Link}
           href="/"
         >
           Accueil
@@ -27,16 +28,10 @@ export default function Navbar() {
 
         <Button
           color="inherit"
+          component={Link}
           href="/creer-evenement"
         >
           Créer un événement
-        </Button>
-
-        <Button
-          color="inherit"
-          href="/superadmin/login"
-        >
-          Super Admin
         </Button>
       </Toolbar>
     </AppBar>
