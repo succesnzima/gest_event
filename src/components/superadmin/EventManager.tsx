@@ -336,7 +336,7 @@ export default function EventManager({ eventId }: { eventId: string }) {
               onChange={handleEventChange}
               required
               fullWidth
-              InputLabelProps={{ shrink: true }}
+              slotProps={{ inputLabel: { shrink: true } }}
             />
             <TextField
               label="Capacité"
@@ -346,7 +346,7 @@ export default function EventManager({ eventId }: { eventId: string }) {
               onChange={handleEventChange}
               required
               fullWidth
-              inputProps={{ min: 1 }}
+              slotProps={{ htmlInput: { min: 1 } }}
             />
             <TextField
               label="Nom de l'organisateur"
