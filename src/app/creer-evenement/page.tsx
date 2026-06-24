@@ -224,7 +224,7 @@ export default function CreerEvenement() {
 
       <Card>
         <CardContent sx={{ p: 3 }}>
-          <Box component="form" onSubmit={handleSubmit}>
+          <Box component="form" onSubmit={handleSubmit} method="POST">
             <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
               Informations de l&apos;événement
             </Typography>

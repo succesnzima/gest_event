@@ -1,13 +1,14 @@
 'use client';
 
-import Link from 'next/link';
-
+import { useRouter } from 'next/navigation';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 
 export default function Navbar() {
+  const router = useRouter();
+
   return (
     <AppBar position="static">
       <Toolbar>
@@ -20,16 +21,14 @@ export default function Navbar() {
 
         <Button
           color="inherit"
-          component={Link}
-          href="/"
+          onClick={() => router.push('/')}
         >
           Accueil
         </Button>
 
         <Button
           color="inherit"
-          component={Link}
-          href="/creer-evenement"
+          onClick={() => router.push('/creer-evenement')}
         >
           Créer un événement
         </Button>
