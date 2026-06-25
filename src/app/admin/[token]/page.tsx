@@ -14,6 +14,8 @@ import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
+import EmailIcon from '@mui/icons-material/Email';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 
 type Participant = {
   id: string;
@@ -26,6 +28,7 @@ type Participant = {
     | 'APPROVED'
     | 'REJECTED'
     | 'CHECKED_IN';
+  qrToken?: string | null;
 };
 
 type Event = {
@@ -105,6 +108,41 @@ export default function AdminPage() {
 
       loadEvent();
     };
+
+  const getBaseUrl = () =>
+    typeof window !== 'undefined'
+      ? window.location.origin
+      : '';
+
+  const getValidationUrl = (token: string) =>
+    `${getBaseUrl()}/checkin/${token}`;
+
+  const getEmailShareLink = (
+    subject: string,
+    body: string
+  ) =>
+    `mailto:?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+
+  const getWhatsappShareLink = (text: string) =>
+    `https://wa.me/?text=${encodeURIComponent(
+      text
+    )}`;
+
+  const shareByEmail = (
+    subject: string,
+    body: string
+  ) => {
+    window.location.href = getEmailShareLink(
+      subject,
+      body
+    );
+  };
+
+  const shareByWhatsapp = (text: string) => {
+    window.open(getWhatsappShareLink(text), '_blank');
+  };
 
   if (loading) {
     return (
@@ -250,6 +288,54 @@ export default function AdminPage() {
                       </Button>
                     </Stack>
                   )}
+
+                  {participant.status ===
+                    'APPROVED' &&
+                    participant.qrToken ? (
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ mt: 2, flexWrap: 'wrap' }}
+                    >
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<EmailIcon />}
+                        onClick={() =>
+                          shareByEmail(
+                            `Code QR de validation pour ${participant.firstName} ${participant.lastName}`,
+                            `Bonjour ${participant.firstName},\n\nVoici votre code QR de validation pour l'entrée : ${getValidationUrl(
+                              participant.qrToken
+                            )}\n\nMerci !`
+                          )
+                        }
+                      >
+                        Mail
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<WhatsAppIcon />}
+                        onClick={() =>
+                          shareByWhatsapp(
+                            `Bonjour ${participant.firstName}, voici votre code QR de validation pour l'entrée : ${getValidationUrl(
+                              participant.qrToken
+                            )}`
+                          )
+                        }
+                      >
+                        WhatsApp
+                      </Button>
+                    </Stack>
+                  ) : participant.status === 'APPROVED' ? (
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ mt: 2, display: 'block' }}
+                    >
+                      QR code non disponible.
+                    </Typography>
+                  ) : null}
                 </Box>
               </CardContent>
             </Card>
