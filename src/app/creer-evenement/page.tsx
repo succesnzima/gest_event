@@ -16,6 +16,9 @@ import Divider from '@mui/material/Divider';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import EmailIcon from '@mui/icons-material/Email';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import DownloadIcon from '@mui/icons-material/Download';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import QRCode from 'qrcode';
@@ -127,6 +130,28 @@ export default function CreerEvenement() {
     setTimeout(() => setCopied(null), 2000);
   };
 
+  const getEmailShareLink = (subject: string, body: string) =>
+    `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  const getWhatsappShareLink = (text: string) =>
+    `https://wa.me/?text=${encodeURIComponent(text)}`;
+
+  const shareByEmail = (subject: string, body: string) => {
+    window.location.href = getEmailShareLink(subject, body);
+  };
+
+  const shareByWhatsapp = (text: string) => {
+    window.open(getWhatsappShareLink(text), '_blank');
+  };
+
+  const downloadQrCode = () => {
+    if (!created) return;
+    const a = document.createElement('a');
+    a.href = created.qrDataUrl;
+    a.download = 'qr-inscription.png';
+    a.click();
+  };
+
   if (created) {
     return (
       <Container maxWidth="sm" sx={{ py: 6 }}>
@@ -151,6 +176,45 @@ export default function CreerEvenement() {
             <Typography variant="caption" color="text.secondary" align="center" sx={{ display: 'block' }}>
               Partagez ce QR Code pour les inscriptions
             </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<EmailIcon />}
+                onClick={() =>
+                  shareByEmail(
+                    `Invitation à s'inscrire : ${created.title}`,
+                    `Bonjour,
+
+Scannez le QR code ci-dessous ou utilisez ce lien pour vous inscrire : ${created.inscriptionUrl}
+
+À bientôt !`
+                  )
+                }
+              >
+                Envoyer par mail
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<WhatsAppIcon />}
+                onClick={() =>
+                  shareByWhatsapp(
+                    `Inscrivez-vous à ${created.title} : ${created.inscriptionUrl}`
+                  )
+                }
+              >
+                WhatsApp
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<DownloadIcon />}
+                onClick={downloadQrCode}
+              >
+                Télécharger QR
+              </Button>
+            </Box>
           </CardContent>
         </Card>
 
@@ -159,7 +223,7 @@ export default function CreerEvenement() {
             <Typography variant="subtitle2" color="text.secondary" gutterBottom>
               LIEN D&apos;INSCRIPTION (PUBLIC)
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1, flexWrap: 'wrap' }}>
               <Typography variant="body2" sx={{ flex: 1, wordBreak: 'break-all', bgcolor: 'grey.50', p: 1, borderRadius: 1, fontFamily: 'monospace', fontSize: '0.8rem' }}>
                 {created.inscriptionUrl}
               </Typography>
@@ -168,6 +232,37 @@ export default function CreerEvenement() {
                   {copied === 'inscription' ? <CheckCircleIcon color="success" fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
                 </IconButton>
               </Tooltip>
+            </Box>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<EmailIcon />}
+                onClick={() =>
+                  shareByEmail(
+                    `Lien d'inscription : ${created.title}`,
+                    `Bonjour,
+
+Cliquez sur ce lien pour inscrire un participant : ${created.inscriptionUrl}
+
+À bientôt !`
+                  )
+                }
+              >
+                Envoyer par mail
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<WhatsAppIcon />}
+                onClick={() =>
+                  shareByWhatsapp(
+                    `Inscrivez-vous à ${created.title} : ${created.inscriptionUrl}`
+                  )
+                }
+              >
+                WhatsApp
+              </Button>
             </Box>
           </CardContent>
         </Card>
